@@ -1,35 +1,59 @@
 const express = require('express')
+var bodyParser = require('body-parser')
 const app = express()
 const port = 3000
 
-
-function middleware1(req, res, next) {
-
-    console.log("From inside middleware : " + req.headers.counter);
-    next();
-}
-app.use(middleware1);
+app.use(bodyParser.json())
 
 function calculateSum(counter) {
     var sum = 0;
-    for (var i = 0; i <= counter; i += 1) {
-        sum += i;
+    for (var i =1 ; i<=counter; i++) {
+        sum = sum + i;
     }
     return sum;
 }
 
-function handleFirstRequest(req, res) {
-    // var counter = req.query.counter;
-    console.log(req.headers);
-    var counter = req.headers.counter;
-    var calculatedSum = calculateSum(counter);
-
-    var answer = "Sum is : " + calculatedSum;
-    res.send(answer);
+function calculateMul(counter) {
+    var answer = 1;
+    for (var i =1 ; i<=counter; i++) {
+        answer = answer * i;
+    }
+    return answer;
 }
 
-// app.get('/handleSum', handleFirstRequest)
-app.post('/handleSum',handleFirstRequest)
+function handleFirstRequest(req, res) {
+    var counter = req.body.counter;
+
+    var calculatedSum = calculateSum(counter);
+    var calculatedMul = calculateMul(counter); 
+
+    var answerObject = {
+        sum: calculatedSum,
+        mul: calculatedMul,
+    };
+
+    res.status(200).send(answerObject);
+}
+
+
+
+function givePage(req, res) {
+    res.send(`<head>
+        <title>
+            Hello from page
+        </title>
+    </head>
+    <body>
+        <i>hi there</i>
+    </body>`)
+}
+
+app.get('/', givePage)
+
+
+
+app.post('/handleSum', handleFirstRequest)
+
 
 function started() {
     console.log(`Example app listening on port ${port}`)
